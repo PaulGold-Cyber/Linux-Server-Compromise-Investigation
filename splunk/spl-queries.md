@@ -71,7 +71,7 @@ index=lab08 source=srv8 "172.16.20.99"
 ## 3. Review Apache Web Activity
 
 ```spl
-index=lab08 source=srv8
+index=lab08 host=srv8
 | sort 0 _time
 ```
 
