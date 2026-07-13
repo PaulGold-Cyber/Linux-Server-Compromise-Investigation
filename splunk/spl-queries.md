@@ -53,6 +53,10 @@ The observed activity included:
 - FTP-based data exfiltration
 - Creation of the `svc_monitor` persistence account
 
+  ### Evidence
+
+![Initial Dataset Review](../screenshots/01-initial-dataset-review.png.png)
+
 ---
 
 ## 2. Search for All Attacker IP Activity
@@ -66,6 +70,8 @@ index=lab08 host=srv8 "172.16.20.99"
 
 **Finding:** The same IP address appeared across web, authentication, and FTP activity, allowing the attack to be correlated across multiple log sources.
 
+![Attacker IP Activity](../screenshots/02-attacker-ip-activity.png)
+
 ---
 
 ## 3. Review Apache Web Activity
@@ -78,6 +84,8 @@ index=lab08 host=srv8
 **Purpose:** Review web requests chronologically and identify reconnaissance, vulnerability scanning, credential attacks, administrative access, web shell activity, and post-exploitation commands.
 
 > **Note:** If the Apache events in the Splunk environment use a different sourcetype name, the exact value should be replaced with the value configured in the lab environment.
+
+![Apache Web Activity](../screenshots/03-apache-web-activity.png)
 
 ---
 
@@ -99,6 +107,8 @@ index=lab08 host=srv8
 - Hydra for credential attacks.
 - LinPEAS for Linux privilege escalation enumeration.
 
+  ![Offensive Security Tools](../screenshots/04-offensive-security-tools.png)
+
 ---
 
 ## 5. Identify Web Shell Activity
@@ -117,8 +127,9 @@ A more targeted search can also be used:
 ```spl
 index=lab08 host=srv8 "shell.php" "cmd="
 | sort 0 _time
-```
 
+```
+![Web Shell Activity](../screenshots/05-web-shell-activity.png)
 ---
 
 ## 6. Identify Sensitive File Discovery and Access
@@ -133,6 +144,8 @@ index=lab08 host=srv8
 
 **Finding:** The attacker targeted database backups, potential private key material, employee-related data, application configuration, and Linux password hashes.
 
+![Sensitive File Activity](../screenshots/06-sensitive-file-activity.png)
+
 ---
 
 ## 7. Investigate SSH Activity Involving `developer`
@@ -145,6 +158,8 @@ index=lab08 host=srv8 "developer"
 **Purpose:** Reconstruct all events involving the compromised `developer` account.
 
 **Finding:** The account was targeted by repeated SSH authentication attempts, successfully accessed using password authentication, and subsequently used to execute privileged commands and obtain a root shell.
+
+![Developer Account Investigation](../screenshots/07-developer-account-investigation.png)
 
 ---
 
@@ -168,6 +183,8 @@ index=lab08 host=srv8 "172.16.20.99"
 | sort 0 _time
 ```
 
+![SSH Authentication](../screenshots/08-ssh-authentication.png)
+
 ---
 
 ## 9. Identify Root Privilege Escalation
@@ -181,6 +198,8 @@ index=lab08 host=srv8
 **Purpose:** Identify commands and authentication events associated with privilege escalation to root.
 
 **Finding:** The compromised `developer` account used existing sudo privileges to access `/etc/shadow` and successfully obtain an interactive root shell.
+
+![Root Privilege Escalation](../screenshots/09-root-privilege-escalation.png)
 
 ---
 
@@ -203,6 +222,8 @@ index=lab08 host=srv8 "svc_monitor"
 
 The chronological results also revealed a timestamp anomaly: FTP authentication occurred before the account's recorded creation time.
 
+![svc_monitor Persistence](../screenshots/10-svc-monitor-persistence.png)
+
 ---
 
 ## 11. Identify FTP Downloads and Uploads
@@ -216,6 +237,8 @@ index=lab08 host=srv8
 **Purpose:** Identify successful FTP authentication, file downloads, and uploads.
 
 **Finding:** The attacker authenticated as `root`, successfully exfiltrated multiple sensitive files, and uploaded the suspicious `/tmp/.hidden/beacon.sh` script.
+
+![FTP File Transfers](../screenshots/11-ftp-file-transfers.png)
 
 ---
 
@@ -231,6 +254,8 @@ index=lab08 host=srv8
 **Purpose:** Isolate confirmed FTP downloads involving sensitive files.
 
 **Finding:** Four sensitive files were successfully downloaded from the compromised server.
+
+![Confirmed Data Exfiltration](../screenshots/12-confirmed-data-exfiltration.png)
 
 ---
 
@@ -250,6 +275,8 @@ index=lab08 host=srv8 "customer_db.sql"
 3. Later successfully downloaded the same file through FTP.
 
 The identical size of `45,102` bytes across the Apache and FTP evidence provided strong cross-source correlation.
+
+![Customer Database Correlation](../screenshots/13-customer-database-correlation.png)
 
 ---
 
