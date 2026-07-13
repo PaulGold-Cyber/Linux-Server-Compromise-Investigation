@@ -5,7 +5,7 @@
 This investigation was conducted in Splunk using the following dataset:
 
 ```spl
-index=lab08 source=srv8
+index=lab08 host=srv8
 ```
 
 The available dataset contained a relatively small number of events across three primary log sources:
@@ -31,7 +31,7 @@ The investigation focused on three main activities:
 The investigation began by reviewing all available events:
 
 ```spl
-index=lab08 source=srv8
+index=lab08 host=srv8
 | sort 0 _time
 ```
 
@@ -58,7 +58,7 @@ The observed activity included:
 ## 2. Search for All Attacker IP Activity
 
 ```spl
-index=lab08 source=srv8 "172.16.20.99"
+index=lab08 host=srv8 "172.16.20.99"
 | sort 0 _time
 ```
 
@@ -84,7 +84,7 @@ index=lab08 host=srv8
 ## 4. Identify Offensive Security Tools
 
 ```spl
-index=lab08 source=srv8
+index=lab08 host=srv8
 ("Nmap Scripting Engine" OR "Nikto" OR "gobuster" OR "Hydra" OR "linpeas")
 | sort 0 _time
 ```
@@ -104,7 +104,7 @@ index=lab08 source=srv8
 ## 5. Identify Web Shell Activity
 
 ```spl
-index=lab08 source=srv8 "shell.php"
+index=lab08 host=srv8 "shell.php"
 | sort 0 _time
 ```
 
@@ -115,7 +115,7 @@ index=lab08 source=srv8 "shell.php"
 A more targeted search can also be used:
 
 ```spl
-index=lab08 source=srv8 "shell.php" "cmd="
+index=lab08 host=srv8 "shell.php" "cmd="
 | sort 0 _time
 ```
 
@@ -124,7 +124,7 @@ index=lab08 source=srv8 "shell.php" "cmd="
 ## 6. Identify Sensitive File Discovery and Access
 
 ```spl
-index=lab08 source=srv8
+index=lab08 host=srv8
 ("customer_db.sql" OR "payment_keys.pem" OR "employee_data.csv" OR "config.php" OR "/etc/shadow")
 | sort 0 _time
 ```
@@ -138,7 +138,7 @@ index=lab08 source=srv8
 ## 7. Investigate SSH Activity Involving `developer`
 
 ```spl
-index=lab08 source=srv8 "developer"
+index=lab08 host=srv8 "developer"
 | sort 0 _time
 ```
 
@@ -151,7 +151,7 @@ index=lab08 source=srv8 "developer"
 ## 8. Identify Failed and Successful SSH Authentication
 
 ```spl
-index=lab08 source=srv8
+index=lab08 host=srv8
 ("Failed password" OR "Accepted password")
 | sort 0 _time
 ```
@@ -163,7 +163,7 @@ index=lab08 source=srv8
 A more focused version can be used:
 
 ```spl
-index=lab08 source=srv8 "172.16.20.99"
+index=lab08 host=srv8 "172.16.20.99"
 ("Failed password" OR "Accepted password")
 | sort 0 _time
 ```
@@ -173,7 +173,7 @@ index=lab08 source=srv8 "172.16.20.99"
 ## 9. Identify Root Privilege Escalation
 
 ```spl
-index=lab08 source=srv8
+index=lab08 host=srv8
 ("Successful su for root" OR "COMMAND=/bin/su -" OR "USER=root")
 | sort 0 _time
 ```
@@ -187,7 +187,7 @@ index=lab08 source=srv8
 ## 10. Investigate `svc_monitor` Persistence
 
 ```spl
-index=lab08 source=srv8 "svc_monitor"
+index=lab08 host=srv8 "svc_monitor"
 | sort 0 _time
 ```
 
@@ -208,7 +208,7 @@ The chronological results also revealed a timestamp anomaly: FTP authentication 
 ## 11. Identify FTP Downloads and Uploads
 
 ```spl
-index=lab08 source=srv8
+index=lab08 host=srv8
 ("OK DOWNLOAD" OR "OK UPLOAD" OR "OK LOGIN")
 | sort 0 _time
 ```
@@ -222,7 +222,7 @@ index=lab08 source=srv8
 ## 12. Search for Confirmed Exfiltration
 
 ```spl
-index=lab08 source=srv8
+index=lab08 host=srv8
 ("customer_db.sql" OR "payment_keys.pem" OR "employee_data.csv" OR "config.php")
 "OK DOWNLOAD"
 | sort 0 _time
@@ -237,7 +237,7 @@ index=lab08 source=srv8
 ## 13. Correlate the Customer Database Across Log Sources
 
 ```spl
-index=lab08 source=srv8 "customer_db.sql"
+index=lab08 host=srv8 "customer_db.sql"
 | sort 0 _time
 ```
 
@@ -280,7 +280,7 @@ The following queries were developed based on behaviors identified during the in
 ### Multiple SSH Failures Followed by Success
 
 ```spl
-index=lab08 source=srv8
+index=lab08 host=srv8
 ("Failed password" OR "Accepted password")
 | rex field=_raw "(?<auth_result>Failed password|Accepted password)"
 | stats count(eval(auth_result="Failed password")) AS failures
@@ -298,7 +298,7 @@ index=lab08 source=srv8
 ### New Account Added to the Sudo Group
 
 ```spl
-index=lab08 source=srv8
+index=lab08 host=srv8
 ("new user:" OR "add '" AND "to group 'sudo'")
 | sort 0 _time
 ```
@@ -310,7 +310,7 @@ index=lab08 source=srv8
 ### Suspicious PHP Execution from Upload Directory
 
 ```spl
-index=lab08 source=srv8 "/uploads/" ".php"
+index=lab08 host=srv8 "/uploads/" ".php"
 | sort 0 _time
 ```
 
@@ -321,7 +321,7 @@ index=lab08 source=srv8 "/uploads/" ".php"
 ### Sensitive File Downloads Through FTP
 
 ```spl
-index=lab08 source=srv8 "OK DOWNLOAD"
+index=lab08 host=srv8 "OK DOWNLOAD"
 (".sql" OR ".pem" OR ".csv" OR "config.php" OR "auth.log" OR "access.log")
 | sort 0 _time
 ```
